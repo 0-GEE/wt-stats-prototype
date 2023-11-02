@@ -34,7 +34,29 @@ function setStopFlag() {
 }
 
 function stopSession() {
+    let r = new XMLHttpRequest();
+    r.open("POST", "/api/stop", true);
 
+    r.onload = function() {
+        if (r.status === 200) {
+            let data = JSON.parse(r.responseText);
+            let figures = document.getElementById("figures-container");
+            let altFigure = document.getElementById("alt-figure");
+            let iasFigure = document.getElementById("ias-figure");
+
+            altFigure.src = data.altitude_plot;
+            iasFigure.src = data.ias_plot;
+
+            figures.hidden = false;
+            theButton.disabled = true;
+
+            instructions.innerHTML = "All done! Enjoy your plots!";
+        } else {
+            console.error("Error during retrieval of plots: " + r.status);
+        }
+    };
+
+    r.send();
 }
 
 async function doSession() {
@@ -49,7 +71,7 @@ async function doSession() {
     };
 
     r.send();
-    
+
     instructions.innerHTML = "Collecting your in-game telemetry... Press 'Stop' to end the collection session.";
     theButton.innerHTML = "Stop";
     inSession = true;
@@ -88,7 +110,7 @@ async function doSession() {
         };
 
         r1.send();
-        await sleep(50);
+        await sleep(80);
     }
     stopSession();
 }

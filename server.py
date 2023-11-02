@@ -17,9 +17,9 @@ COL_IAS = "IAS  km/h"
 COL_ALT = "H  m"
 
 GET_FILE_EXT_ALLOWLIST = [
-    ".png",
-    ".jpg",
-    ".jpeg"
+    "png",
+    "jpg",
+    "jpeg"
 ]
 
 
@@ -105,7 +105,7 @@ def start_session():
     filepath = os.path.join(app.config['UPLOAD_FOLDER'], iso_to_filename(curr_time.isoformat()) + ".csv")
 
     with open(filepath, 'w') as f:
-        f.writelines([f"{COL_TIME}, {COL_ALT}, {COL_IAS}\n"])
+        f.writelines([f"{COL_TIME},{COL_ALT},{COL_IAS}\n"])
 
     session["start_time"] = curr_time.isoformat()
     session["stopped"] = False
@@ -135,6 +135,8 @@ def stop_session():
 
     ias_figure_filename = os.path.join(app.config['UPLOAD_FOLDER'], iso_to_filename(session["start_time"]) + "_ias.jpg")
 
+    plt.clf()
+
     plt.plot(time_col, ias_col)
     plt.title("IAS vs. Time")
     plt.ylabel("IAS (km/h)")
@@ -150,7 +152,7 @@ def stop_session():
 
 @app.route("/files/<filename>", methods = ['GET'])
 def get_file(filename):
-    if filename.split(".")[-1] != GET_FILE_EXT_ALLOWLIST:
+    if filename.split(".")[-1] not in GET_FILE_EXT_ALLOWLIST:
         abort(403)
 
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
